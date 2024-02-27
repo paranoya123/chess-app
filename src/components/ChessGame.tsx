@@ -103,6 +103,8 @@ export default function ChessGame() {
                         white: { left: false, right: false },
                         black: { left: false, right: false },
                     });
+                    setCapturedWhites([]);
+                    setCapturedBlacks([]);
                 }}
             >
               Play Again
