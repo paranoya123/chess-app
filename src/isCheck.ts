@@ -31,7 +31,7 @@ const findKingPosition = (board: Board, king: string): Position | never => {
 };
 
 const isPawnThreat = (board: Board, { row, col }: Position, opponentPawn: string, isWhite: boolean): boolean => {
-  const direction = isWhite ? -1 : 1;
+  const direction = isWhite ? 1 : -1;
 
   return [col - 1, col + 1].some(c => board[row + direction]?.[c] === opponentPawn);
 };

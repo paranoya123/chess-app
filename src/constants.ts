@@ -16,15 +16,18 @@ export const BISHOP_BLACK = '♝';
 export const WHITES = [KING_WHITE, QUEEN_WHITE, PAWN_WHITE, KNIGHT_WHITE, ROOK_WHITE, BISHOP_WHITE]
 export const BLACKS = [KING_BLACK, QUEEN_BLACK, PAWN_BLACK, KNIGHT_BLACK, ROOK_BLACK, BISHOP_BLACK]
 
+export const WHITE_ROYALS = [QUEEN_WHITE, KNIGHT_WHITE, ROOK_WHITE, BISHOP_WHITE]
+export const BLACK_ROYALS = [QUEEN_BLACK, KNIGHT_BLACK, ROOK_BLACK, BISHOP_BLACK]
+
 export const initialBoardState = [
-    [ROOK_BLACK, KNIGHT_BLACK, BISHOP_BLACK, QUEEN_BLACK, KING_BLACK, BISHOP_BLACK, KNIGHT_BLACK, ROOK_BLACK],
+  [ROOK_WHITE, KNIGHT_WHITE, BISHOP_WHITE, QUEEN_WHITE, KING_WHITE, BISHOP_WHITE, KNIGHT_WHITE, ROOK_WHITE],
+  [PAWN_WHITE, PAWN_WHITE, PAWN_WHITE, PAWN_WHITE, PAWN_WHITE, PAWN_WHITE, PAWN_WHITE, PAWN_WHITE],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
     [PAWN_BLACK, PAWN_BLACK, PAWN_BLACK, PAWN_BLACK, PAWN_BLACK, PAWN_BLACK, PAWN_BLACK, PAWN_BLACK],
-    ["", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", ""],
-    [PAWN_WHITE, PAWN_WHITE, PAWN_WHITE, PAWN_WHITE, PAWN_WHITE, PAWN_WHITE, PAWN_WHITE, PAWN_WHITE],
-    [ROOK_WHITE, KNIGHT_WHITE, BISHOP_WHITE, QUEEN_WHITE, KING_WHITE, BISHOP_WHITE, KNIGHT_WHITE, ROOK_WHITE],
+    [ROOK_BLACK, KNIGHT_BLACK, BISHOP_BLACK, QUEEN_BLACK, KING_BLACK, BISHOP_BLACK, KNIGHT_BLACK, ROOK_BLACK],
   ];
 
 interface MapIconToFigure {
@@ -46,6 +49,15 @@ interface MapIconToFigure {
     [BISHOP_BLACK]: 'bishop',
     [PAWN_BLACK]: 'pawn',
  }
+
+ export const mapWhiteIconToBlack: MapIconToFigure = {
+  [KING_WHITE]: KING_BLACK,
+  [KNIGHT_WHITE]: KNIGHT_BLACK,
+  [QUEEN_WHITE]: QUEEN_BLACK,
+  [ROOK_WHITE]: ROOK_BLACK,
+  [BISHOP_WHITE]: BISHOP_BLACK,
+  [PAWN_WHITE]: PAWN_BLACK
+}
 
  export const ItemTypes = {
   PIECE: 'piece',

@@ -32,6 +32,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  color: black;
 }
 
 .playAgainButton {
@@ -66,4 +67,46 @@
   color: #d32f2f;
   padding-bottom: 20px;
   text-align: center;
+}
+
+.gameContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.capturedPieces {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  margin: 0 20px;
+  cursor: pointer;
+}
+
+.capturedPieceBlack {
+  font-size: 24px;
+  margin: 2px;
+  color: black;
+}
+
+.capturedPieceWhite {
+  font-size: 24px;
+  margin: 2px;
+  color: white;
+}
+
+.chessBoard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.containerSwap {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: green;
 }

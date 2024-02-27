@@ -1,5 +1,6 @@
 import { Board } from "./types";
-import { WHITES, BLACKS } from "./constants";
+import { WHITES, BLACKS, ROOK_BLACK, ROOK_WHITE } from "./constants";
+import { isKingInCheck } from "./isCheck";
 
 const stepOnMate = (board: Board, startRow: number, startCol: number, endRow: number, endCol: number) => {
     if (WHITES.includes(board[startRow][startCol]) ? WHITES.includes(board[endRow][endCol]) : BLACKS.includes(board[endRow][endCol])) {
@@ -10,11 +11,20 @@ const stepOnMate = (board: Board, startRow: number, startCol: number, endRow: nu
 }
 
 interface MoveFunction {
-    (board: Board, startRow: number, startCol: number, endRow: number, endCol: number): boolean;
-  }
+    (board: Board,
+    startRow: number,
+    startCol: number,
+    endRow: number,
+    endCol: number,
+    isKingMoved?: boolean, 
+    isRightRookMoved?: boolean,
+    isLeftRookMoved?: boolean,
+    withUpdate?: boolean,
+    ): boolean;
+ }
   
 interface IsValidMove {
-[key: string]: MoveFunction;
+  [key: string]: MoveFunction;
 }
 
 export const isValidMove: IsValidMove = {
@@ -104,19 +114,45 @@ export const isValidMove: IsValidMove = {
         
           return true;
     },
-    king: (board: Board, startRow: number, startCol: number, endRow: number, endCol: number) => {
-        if(stepOnMate(board, startRow, startCol, endRow, endCol)) return false;
+    king: (board: Board, startRow: number, startCol: number, endRow: number, endCol: number,
+      isKingMoved?: boolean, isRightRookMoved?: boolean, isLeftRookMoved?: boolean, withUpdate?: boolean) => {
+      const isWhite = WHITES.includes(board[startRow][startCol]);
 
-        const rowDiff = Math.abs(endRow - startRow);
-        const colDiff = Math.abs(endCol - startCol);
-        return (rowDiff <= 1 && colDiff <= 1) && !(rowDiff === 0 && colDiff === 0);
+      if (stepOnMate(board, startRow, startCol, endRow, endCol)) return false;
+
+      const rowDiff = Math.abs(endRow - startRow);
+      const colDiff = Math.abs(endCol - startCol);
+
+      if (rowDiff <= 1 && colDiff <= 1 && !(rowDiff === 0 && colDiff === 0)) {
+        return true;
+      }
+
+      // Castling check
+      if (!isKingMoved && rowDiff === 0 && (colDiff === 2 || colDiff === 3)) {
+        const direction = endCol - startCol > 0 ? 'right' : 'left';
+        const rookCol = direction === 'right' ? 7 : 0;
+        const isRookMoved = direction === 'right' ? isRightRookMoved : isLeftRookMoved;
+        const pathClear = isPathClearForCastling(board, startRow, startCol, direction, isWhite);
+
+        if (!isRookMoved && pathClear && !isKingInCheck(board, isWhite)) {
+          const rookDestinationCol = direction === 'right' ? endCol - 1 : endCol + 1;
+          if(withUpdate){
+            board[startRow][rookCol] = '';
+            board[startRow][rookDestinationCol] = isWhite ? ROOK_WHITE : ROOK_BLACK;
+          }
+
+          return true;
+        }
+      }
+
+      return false;
     },
     pawn: (board: Board, startRow: number, startCol: number, endRow: number, endCol: number) => {
         if(stepOnMate(board, startRow, startCol, endRow, endCol)) return false;
 
         const isWhite = WHITES.includes(board[startRow][startCol])
-        const forward = isWhite ? -1 : 1;
-        const initialRow = isWhite ? 6 : 1;
+        const forward = isWhite ? 1 : -1;
+        const initialRow = isWhite ? 1 : 6;
         let moveIsValid = false;
 
         if (startCol === endCol) {
@@ -137,4 +173,28 @@ export const isValidMove: IsValidMove = {
 
         return moveIsValid;
     },
+}
+
+function isPathClearForCastling(board: Board, row: number, startCol: number, direction: 'right' | 'left', isWhite: boolean) {
+  const endCol = direction === 'right' ? 7 : 0;
+  const step = direction === 'right' ? 1 : -1;
+
+  for (let col = startCol + step; col !== endCol; col += step) {
+    if (board[row][col] !== '') {
+      return false;
+    }
+
+    let tempKingPos = board[row][startCol];
+    board[row][startCol] = '';
+    board[row][col] = tempKingPos;
+    if (isKingInCheck(board, isWhite)) {
+      board[row][col] = '';
+      board[row][startCol] = tempKingPos;
+      return false;
+    }
+    board[row][col] = '';
+    board[row][startCol] = tempKingPos; 
+  }
+
+  return true;
 }

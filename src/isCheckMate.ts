@@ -2,24 +2,16 @@ import { Board, Move } from "./types";
 import { mapIconToFigure } from "./constants";
 import { isValidMove } from "./moves";
 import { isKingInCheck } from "./isCheck";
+import { BLACKS, WHITES } from "./constants";
 
 export const isCheckMate = (board: Board, isWhite: boolean): boolean => {
   for (let row = 0; row < board.length; row++) {
     for (let col = 0; col < board[row].length; col++) {
-      const piece = board[row][col];
-      if (piece !== '' && isPieceColor(piece, isWhite)) {
-        const legalMoves: Move[] = generateLegalMovesForPiece(board, row, col, isWhite, piece);
-        for (const [newRow, newCol] of legalMoves) {
-          const tempPiece = board[newRow][newCol];
-          board[newRow][newCol] = piece;
-          board[row][col] = '';
-          const stillInCheck = isKingInCheck(board, isWhite);
-          board[row][col] = piece;
-          board[newRow][newCol] = tempPiece;
+      if (board[row][col] && isPieceColor(board[row][col], isWhite)) {
+        const legalMoves: Move[] = generateLegalMovesForPiece(board, row, col);
 
-          if (!stillInCheck) {
-            return false;
-          }
+        if(legalMoves.length){
+            return false
         }
       }
     }
@@ -29,19 +21,26 @@ export const isCheckMate = (board: Board, isWhite: boolean): boolean => {
 };
 
 const isPieceColor = (piece: string, isWhite: boolean): boolean => {
-  const whitePieces: string[] = ['♔', '♕', '♖', '♗', '♘', '♙'];
-  const blackPieces: string[] = ['♚', '♛', '♜', '♝', '♞', '♟︎'];
-  return isWhite ? whitePieces.includes(piece) : blackPieces.includes(piece);
-};
+    return isWhite ? WHITES.includes(piece) : BLACKS.includes(piece);
+  };
 
-const generateLegalMovesForPiece = (board: Board, row: number, col: number, isWhite: boolean, piece: string): Move[] => {
-    const figure = mapIconToFigure[piece]
+export const generateLegalMovesForPiece = (board: Board, row: number, col: number, kingMoved?: {black: boolean, white: boolean},
+     rooksMoved?: {black: {left: boolean, right: boolean}, white: {left: boolean, right: boolean}}): Move[] => {
+    const figure = mapIconToFigure[board[row][col]]
+    const isWhite = WHITES.includes(board[row][col])
     const moves = [] as Move[]
 
-    for(let i = 0; i < 8; i++){
-        for(let j = 0; j < 8; j++){
-            if(isValidMove[figure](board, row, col, i, j)){
-                moves.push([i, j])
+    for(let i = 0; i < board.length; i++){
+        for(let j = 0; j < board[i].length; j++){
+            if(isValidMove[figure](board, row, col, i, j, isWhite ? kingMoved?.white : kingMoved?.black,
+                isWhite ? rooksMoved?.white.right : rooksMoved?.black.right,
+                isWhite ? rooksMoved?.white.left : rooksMoved?.black.left,)){
+                const newBoard = [...board.map(row => [...row])];
+                newBoard[i][j] = board[row][col];
+                newBoard[row][col] = '';
+                const stillInCheck = isKingInCheck(newBoard, isWhite);
+
+                if(!stillInCheck) moves.push([i, j])
             }
         }
     }
